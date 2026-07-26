@@ -109,15 +109,16 @@ const besoinsRenomme = lignesVersCommunes(
 assert.equal(besoinsRenomme, null,
   'une fiche qui n\'afficherait que « ne plus apporter » ferait croire que la mairie ne manque de rien');
 
-const modele = lignesVersCommunes(
+const amorce = lignesVersCommunes(
   parseCSV(readFileSync(new URL('./a-importer-dans-le-tableur.csv', import.meta.url), 'utf8')),
   '2026-07-26',
 );
-assert.equal(modele.length, 1, 'le modèle contient les en-têtes et une seule ligne d\'exemple');
-assert.match(modele[0].nom, /EXEMPLE/, 'la ligne d\'exemple doit être reconnaissable comme telle');
-assert.ok(modele[0].besoins.length && modele[0].satures.length,
-  'l\'exemple doit montrer les deux colonnes de listes');
-assert.equal(modele[0].tel, '0556000000');
-assert.equal(modele[0].maj, '2026-07-26');
+assert.ok(amorce.length >= 3, 'la feuille de départ doit contenir assez de communes pour ne pas paraître morte');
+for (const c of amorce) {
+  assert.ok(c.lieu && c.horaires, `${c.nom} : lieu et horaires obligatoires`);
+  assert.ok(c.besoins.length, `${c.nom} : une fiche sans besoins n'aide personne`);
+  assert.ok(c.maj, `${c.nom} : date de vérification illisible`);
+  assert.ok(c.qui, `${c.nom} : la source doit être traçable`);
+}
 
 console.log('OK');

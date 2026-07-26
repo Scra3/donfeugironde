@@ -46,7 +46,7 @@ publie plus rien et renvoie vers le numéro vert. C'est délibéré : une fiche 
 besoins laisserait croire que la mairie ne manque de rien.
 
 **`Vérifié le` est la colonne la plus importante.** À partir de 2 jours, la fiche affiche
-automatiquement un bandeau orange « téléphonez avant de vous déplacer ». Une date absente,
+automatiquement un bandeau orange « peut ne plus être à jour ». Une date absente,
 illisible ou située dans le futur déclenche le même avertissement : post-dater une ligne ne la
 rend pas fraîche, ça la marque comme douteuse.
 
@@ -59,7 +59,7 @@ Protéger la ligne d'en-têtes (clic droit sur la ligne 1 → Afficher plus d'ac
 
 Aucune commune n'est inscrite en dur dans le code : la feuille est la seule source. Tant qu'aucune
 mairie n'a rempli sa ligne, la page l'annonce et invite à en ajouter une. Si la feuille devient
-injoignable, la page renvoie vers le numéro vert plutôt que d'afficher une liste périmée.
+injoignable, la page le dit et renvoie vers les mairies plutôt que d'afficher une liste périmée.
 
 ## Développement
 
@@ -86,5 +86,3 @@ Volontairement :
 - pas de carte des feux → [aideetfeu.com](https://aideetfeu.com/)
 - pas d'hébergement d'évacués → [entraide-hebergement.vercel.app](https://entraide-hebergement.vercel.app/)
 - pas de qualité de l'air → [Atmo Nouvelle-Aquitaine](https://www.atmo-nouvelleaquitaine.org/)
-
-Numéro vert dons et bénévolat : **0 800 006 090**.

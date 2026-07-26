@@ -91,8 +91,7 @@
   <p class="discret">Incendies de Gironde. Ce dont chaque mairie a besoin, et ce qu'il ne faut plus apporter.</p>
 
   <div class="encadre">
-    <p><strong>Cette page est écrite par tout le monde.</strong> Les informations ne sont pas vérifiées par les autorités. <strong>Téléphonez avant de vous déplacer.</strong></p>
-    <a class="bouton" href="tel:0800006090">📞 Numéro vert&nbsp;: 0 800 006 090</a>
+    <p><strong>Cette page est écrite par tout le monde.</strong> Les informations sont renseignées par les mairies et les habitants, et ne sont pas vérifiées par les autorités.</p>
     <p class="discret">N'apportez jamais de dons directement au Parc des Expositions ni sur les lieux d'accueil des évacués&nbsp;: tout passe par les mairies.</p>
   </div>
 
@@ -106,7 +105,7 @@
   </div>
   <p id="compte" class="discret" role="status">Chargement de la liste…</p>
   <div id="liste"><div class="bloc vieux">Si rien ne s'affiche au bout de quelques secondes,
-    appelez le 0 800 006 090 ou votre mairie.</div></div>
+    contactez directement votre mairie.</div></div>
 
   <a class="bouton secondaire" id="lien-edition-bas" href="#">✏️ Ajouter ou corriger une mairie</a>
   <p class="discret" id="pied"></p>
@@ -153,11 +152,11 @@ const carte = (c) => {
 
   let fraicheur = '';
   if (age === null) {
-    fraicheur = `<div class="bloc vieux">⚠️ Personne n'a indiqué quand cette information a été vérifiée.
-      Téléphonez avant de vous déplacer.</div>`;
+    fraicheur = `<div class="bloc vieux">⚠️ Personne n'a indiqué quand cette information a été
+      vérifiée. Elle peut ne plus être à jour.</div>`;
   } else if (age >= 2) {
     fraicheur = `<div class="bloc vieux">⚠️ Information vérifiée ${signature}, il y a ${age} jours.
-      Les besoins changent tous les jours&nbsp;: téléphonez avant de vous déplacer.</div>`;
+      Les besoins changent tous les jours&nbsp;: celle-ci peut ne plus être à jour.</div>`;
   }
 
   const besoins = c.besoins.length
@@ -196,12 +195,12 @@ const afficher = () => {
   const trouves = communes.filter((c) => correspond(c, champ.value));
   compte.textContent = trouves.length
     ? `${trouves.length} lieu${trouves.length > 1 ? 'x' : ''} de collecte`
-    : `Aucun résultat pour « ${champ.value} ». Effacez pour tout revoir, ou appelez le 0 800 006 090.`;
+    : `Aucun résultat pour « ${champ.value} ». Effacez la recherche pour revoir toutes les mairies.`;
   liste.innerHTML = trouves.map(carte).join('');
 };
 
 if (communes === null) {
-  message("La liste est momentanément inaccessible. Appelez le 0 800 006 090, ou votre mairie.");
+  message('La liste est momentanément inaccessible. Contactez directement votre mairie.');
 } else if (!communes.length) {
   message("Aucune mairie n'a encore indiqué ses besoins. Si vous travaillez en mairie, "
     + 'ou si vous avez appelé la vôtre, ajoutez-la avec le bouton ci-dessous : '

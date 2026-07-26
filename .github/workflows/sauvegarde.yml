@@ -1,0 +1,54 @@
+name: Sauvegarde du tableur
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sauvegarde
+  cancel-in-progress: false
+
+jobs:
+  sauvegarder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Télécharger le tableur
+        run: |
+          curl -sfL --retry 3 --max-time 30 \
+            "https://docs.google.com/spreadsheets/d/1XxpTE9LCPJ1tkyzp5BqnIubrcZd2OP5Mp-UPF6FB9f0/export?format=csv" \
+            -o /tmp/tableur.csv
+
+      - name: Refuser une copie illisible
+        run: |
+          node -e "
+            const fs = require('node:fs');
+            import('./app.js').then(({ parseCSV, lignesVersCommunes }) => {
+              const communes = lignesVersCommunes(
+                parseCSV(fs.readFileSync('/tmp/tableur.csv', 'utf8')), '2026-01-01');
+              if (!communes || !communes.length) {
+                console.error('Tableur vide ou illisible : sauvegarde annulée, la copie précédente est conservée.');
+                process.exit(1);
+              }
+              console.log(communes.length + ' communes lisibles');
+            });
+          "
+
+      - name: Publier si le contenu a changé
+        run: |
+          cp /tmp/tableur.csv sauvegardes/tableur.csv
+          git config user.name 'Sauvegarde automatique'
+          git config user.email 'actions@github.com'
+          git add sauvegardes/tableur.csv
+          if git diff --cached --quiet; then
+            echo 'Aucun changement depuis la dernière sauvegarde.'
+          else
+            git commit -m "Sauvegarde du tableur — $(date -u '+%d/%m/%Y %H:%M UTC')"
+            git pull --rebase --autostash origin main
+            git push origin main
+          fi

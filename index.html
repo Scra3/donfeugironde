@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Où apporter vos dons — Incendies Gironde</title>
+<meta name="description" content="Ce dont chaque mairie de Gironde a besoin aujourd'hui, et ce qu'il ne faut plus apporter. Page modifiable par tous.">
+<style>
+  :root {
+    --texte: #16181d;
+    --fond: #fff;
+    --gris: #4a4f57;
+    --bord: #c9ced6;
+    --vert-fond: #e6f4ea;
+    --vert-texte: #0a5c2a;
+    --rouge-fond: #fdeaec;
+    --rouge-texte: #96101d;
+    --alerte-fond: #fff4d6;
+    --alerte-texte: #6b4700;
+    --action: #0b4da8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --texte: #f2f4f7; --fond: #14161a; --gris: #b9bfc9; --bord: #3a4048;
+      --vert-fond: #10331f; --vert-texte: #7fe0a1;
+      --rouge-fond: #3a1418; --rouge-texte: #ff9fa9;
+      --alerte-fond: #3a2e10; --alerte-texte: #ffd98a;
+      --action: #6fb0ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 1rem 1rem 4rem;
+    font: 1.25rem/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--texte);
+    background: var(--fond);
+  }
+  main, header { max-width: 44rem; margin: 0 auto; }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .25rem; }
+  h2 { font-size: 1.55rem; line-height: 1.2; margin: 0 0 .5rem; }
+  h3 { font-size: 1.1rem; margin: 0 0 .35rem; text-transform: uppercase; letter-spacing: .04em; }
+  p { margin: .4rem 0; }
+  a { color: inherit; }
+  .discret { color: var(--gris); font-size: 1.05rem; }
+
+  .encadre { border: 3px solid var(--texte); border-radius: .6rem; padding: 1rem; margin: 1rem 0; }
+  .bouton {
+    display: block;
+    text-align: center;
+    padding: 1rem;
+    min-height: 3.5rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: .5rem;
+    background: var(--texte);
+    color: var(--fond);
+  }
+  .bouton.secondaire { background: var(--action); color: #fff; }
+  @media (prefers-color-scheme: dark) { .bouton.secondaire { color: #06101f; } }
+
+  label { display: block; font-weight: 700; margin-bottom: .4rem; }
+  input {
+    width: 100%;
+    padding: .9rem;
+    min-height: 3.5rem;
+    font-size: 1.3rem;
+    font-family: inherit;
+    color: var(--texte);
+    background: var(--fond);
+    border: 3px solid var(--bord);
+    border-radius: .5rem;
+  }
+  input:focus-visible, a:focus-visible { outline: 4px solid #0b63d6; outline-offset: 2px; }
+
+  .carte { border: 2px solid var(--bord); border-radius: .6rem; padding: 1.1rem; margin: 1.25rem 0; }
+  .bloc { border-radius: .5rem; padding: .75rem 1rem; margin-top: .75rem; }
+  .oui { background: var(--vert-fond); color: var(--vert-texte); }
+  .non { background: var(--rouge-fond); color: var(--rouge-texte); }
+  .vieux { background: var(--alerte-fond); color: var(--alerte-texte); font-weight: 600; }
+  ul { margin: .25rem 0; padding-left: 1.5rem; }
+  li { margin: .3rem 0; }
+  .contacts a { display: inline-block; margin-top: .6rem; padding: .5rem 0; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Où apporter vos dons ?</h1>
+  <p class="discret">Incendies de Gironde. Ce dont chaque mairie a besoin, et ce qu'il ne faut plus apporter.</p>
+
+  <div class="encadre">
+    <p><strong>Cette page est écrite par tout le monde.</strong> Les informations ne sont pas vérifiées par les autorités. <strong>Téléphonez avant de vous déplacer.</strong></p>
+    <a class="bouton" href="tel:0800006090">📞 Numéro vert&nbsp;: 0 800 006 090</a>
+    <p class="discret">N'apportez jamais de dons directement au Parc des Expositions ni sur les lieux d'accueil des évacués&nbsp;: tout passe par les mairies.</p>
+  </div>
+
+  <a class="bouton secondaire" id="lien-edition-haut" href="#">✏️ Ajouter ou corriger une mairie</a>
+</header>
+
+<main>
+  <div id="recherche" hidden>
+    <label for="q">Votre commune, ou ce que vous voulez donner</label>
+    <input id="q" type="search" autocomplete="off" placeholder="Exemple : Bruges, ou couches">
+  </div>
+  <p id="compte" class="discret" role="status">Chargement de la liste…</p>
+  <div id="liste"><div class="bloc vieux">Si rien ne s'affiche au bout de quelques secondes,
+    appelez le 0 800 006 090 ou votre mairie.</div></div>
+
+  <a class="bouton secondaire" id="lien-edition-bas" href="#">✏️ Ajouter ou corriger une mairie</a>
+  <p class="discret" id="pied"></p>
+</main>
+
+<script type="module">
+import { parseCSV, lignesVersCommunes, correspond, joursDepuis, dateFr, echappe } from './app.js';
+
+const FEUILLE = '1XxpTE9LCPJ1tkyzp5BqnIubrcZd2OP5Mp-UPF6FB9f0';
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${FEUILLE}/export?format=csv`;
+const EDITION_URL = `https://docs.google.com/spreadsheets/d/${FEUILLE}/edit`;
+
+const maintenant = new Date();
+const AUJOURDHUI = [
+  maintenant.getFullYear(),
+  String(maintenant.getMonth() + 1).padStart(2, '0'),
+  String(maintenant.getDate()).padStart(2, '0'),
+].join('-');
+const liste = document.getElementById('liste');
+const compte = document.getElementById('compte');
+const champ = document.getElementById('q');
+const recherche = document.getElementById('recherche');
+
+for (const id of ['lien-edition-haut', 'lien-edition-bas']) {
+  const lien = document.getElementById(id);
+  lien.href = EDITION_URL;
+  lien.target = '_blank';
+  lien.rel = 'noopener';
+}
+
+const points = (items) => items.map((i) => `<li>${echappe(i)}</li>`).join('');
+
+const chargerFeuille = async () => {
+  const reponse = await fetch(CSV_URL, { cache: 'no-store', signal: AbortSignal.timeout(10000) });
+  if (!reponse.ok) throw new Error(reponse.status);
+  return lignesVersCommunes(parseCSV(await reponse.text()), AUJOURDHUI);
+};
+
+const carte = (c) => {
+  const age = joursDepuis(c.maj, AUJOURDHUI);
+  const signature = echappe(
+    [c.qui && `par ${c.qui}`, c.maj && `le ${dateFr(c.maj)}`].filter(Boolean).join(', ')
+  );
+
+  let fraicheur = '';
+  if (age === null) {
+    fraicheur = `<div class="bloc vieux">⚠️ Personne n'a indiqué quand cette information a été vérifiée.
+      Téléphonez avant de vous déplacer.</div>`;
+  } else if (age >= 2) {
+    fraicheur = `<div class="bloc vieux">⚠️ Information vérifiée ${signature}, il y a ${age} jours.
+      Les besoins changent tous les jours&nbsp;: téléphonez avant de vous déplacer.</div>`;
+  }
+
+  const besoins = c.besoins.length
+    ? `<div class="bloc oui"><h3>✓ À apporter</h3><ul>${points(c.besoins)}</ul></div>` : '';
+  const satures = c.satures.length
+    ? `<div class="bloc non"><h3>✕ Ne plus apporter</h3><ul>${points(c.satures)}</ul></div>` : '';
+
+  const contacts = [
+    c.tel ? `<a href="tel:${echappe(c.tel)}">📞 ${echappe(c.telLisible)}</a>` : '',
+    c.email ? `<a href="mailto:${echappe(c.email)}">✉️ ${echappe(c.email)}</a>` : '',
+  ].filter(Boolean).join('<br>');
+
+  return `<section class="carte">
+    <h2>${echappe(c.nom)}</h2>
+    ${c.lieu ? `<p><a target="_blank" rel="noopener" href="https://www.openstreetmap.org/search?query=${encodeURIComponent(`${c.lieu}, ${c.nom}`)}">📍 ${echappe(c.lieu)}</a></p>` : ''}
+    ${c.horaires ? `<p>🕒 ${echappe(c.horaires)}</p>` : ''}
+    ${fraicheur}
+    ${besoins}
+    ${satures}
+    ${contacts ? `<p class="contacts">${contacts}</p>` : ''}
+    ${age !== null && age < 2 ? `<p class="discret">Vérifié ${signature}.</p>` : ''}
+  </section>`;
+};
+
+const message = (texte) => {
+  compte.textContent = '';
+  liste.innerHTML = `<div class="bloc vieux">${texte}</div>`;
+};
+
+const communes = await chargerFeuille().catch((erreur) => {
+  console.error(erreur);
+  return null;
+});
+
+const afficher = () => {
+  const trouves = communes.filter((c) => correspond(c, champ.value));
+  compte.textContent = trouves.length
+    ? `${trouves.length} lieu${trouves.length > 1 ? 'x' : ''} de collecte`
+    : `Aucun résultat pour « ${champ.value} ». Effacez pour tout revoir, ou appelez le 0 800 006 090.`;
+  liste.innerHTML = trouves.map(carte).join('');
+};
+
+if (communes === null) {
+  message("La liste est momentanément inaccessible. Appelez le 0 800 006 090, ou votre mairie.");
+} else if (!communes.length) {
+  message("Aucune mairie n'a encore indiqué ses besoins. Si vous travaillez en mairie, "
+    + 'ou si vous avez appelé la vôtre, ajoutez-la avec le bouton ci-dessous : '
+    + 'elle apparaîtra ici immédiatement.');
+} else {
+  recherche.hidden = false;
+  champ.addEventListener('input', afficher);
+  afficher();
+}
+
+document.getElementById('pied').textContent =
+  "Page citoyenne, sans lien avec les autorités. N'importe qui peut la corriger, "
+  + 'et toutes les modifications sont conservées dans l\'historique de la feuille partagée.';
+</script>
+
+</body>
+</html>

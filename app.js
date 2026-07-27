@@ -126,5 +126,5 @@ export const lignesVersCommunes = (lignes, aujourdhui) => {
       maj: parseDate(brut.maj, aujourdhui),
       qui: (brut.qui ?? '').trim(),
     };
-  }).filter((c) => c.nom && (c.besoins.length || c.satures.length));
+  }).filter((c) => c.nom);
 };

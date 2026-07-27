@@ -74,7 +74,7 @@ const feuille = parseCSV(
   + 'Vide,Mairie,9h,,,,,26/07/2026,\n'
 );
 const communes = lignesVersCommunes(feuille, '2026-07-26');
-assert.equal(communes.length, 1, 'lignes sans commune ou sans contenu ignorées');
+assert.equal(communes.length, 2, 'seules les lignes sans nom de commune sont ignorées');
 assert.deepEqual(communes[0], {
   nom: 'Bruges', lieu: 'Hôtel de Ville', horaires: '9h-13h',
   besoins: ['Eau', 'Couches'], satures: ['Vêtements'],
@@ -108,6 +108,14 @@ const besoinsRenomme = lignesVersCommunes(
 );
 assert.equal(besoinsRenomme, null,
   'une fiche qui n\'afficherait que « ne plus apporter » ferait croire que la mairie ne manque de rien');
+
+const ferme = lignesVersCommunes(
+  parseCSV('Commune,Lieu,Horaires,Besoins\nLe Haillan,Salle du Forum,VILLE EVACUEE c\'est fermé,'),
+  '2026-07-27',
+);
+assert.equal(ferme.length, 1,
+  'une collecte fermée doit rester affichée : la fermeture est l\'information la plus utile de la fiche');
+assert.equal(ferme[0].horaires, 'VILLE EVACUEE c\'est fermé');
 
 const amorce = lignesVersCommunes(
   parseCSV(readFileSync(new URL('./a-importer-dans-le-tableur.csv', import.meta.url), 'utf8')),

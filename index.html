@@ -162,7 +162,8 @@ const carte = (c) => {
   }
 
   const besoins = c.besoins.length
-    ? `<div class="bloc oui"><h3>✓ À apporter</h3><ul>${points(c.besoins)}</ul></div>` : '';
+    ? `<div class="bloc oui"><h3>✓ À apporter</h3><ul>${points(c.besoins)}</ul></div>`
+    : '<p class="discret">Besoins non renseignés pour le moment. Ne présumez pas que cette mairie ne manque de rien.</p>';
   const satures = c.satures.length
     ? `<div class="bloc non"><h3>✕ Ne plus apporter</h3><ul>${points(c.satures)}</ul></div>` : '';
 

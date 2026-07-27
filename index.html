@@ -162,14 +162,15 @@ const carte = (c) => {
   }
 
   const besoins = c.besoins.length
-    ? `<div class="bloc oui"><h3>✓ À apporter</h3><ul>${points(c.besoins)}</ul></div>`
-    : '<p class="discret">Besoins non renseignés pour le moment. Ne présumez pas que cette mairie ne manque de rien.</p>';
+    ? `<div class="bloc oui"><h3>✓ À apporter</h3><ul>${points(c.besoins)}</ul></div>` : '';
   const satures = c.satures.length
     ? `<div class="bloc non"><h3>✕ Ne plus apporter</h3><ul>${points(c.satures)}</ul></div>` : '';
 
   const contacts = [
-    c.tel ? `<a href="tel:${echappe(c.tel)}">📞 ${echappe(c.telLisible)}</a>` : '',
-    c.email ? `<a href="mailto:${echappe(c.email)}">✉️ ${echappe(c.email)}</a>` : '',
+    c.tel ? `<a href="tel:${echappe(c.tel)}">📞 ${echappe(c.telLisible)}</a>`
+      : c.telLisible && `📞 ${echappe(c.telLisible)}`,
+    c.email ? `<a href="mailto:${echappe(c.email)}">✉️ ${echappe(c.email)}</a>`
+      : c.emailLisible && `✉️ ${echappe(c.emailLisible)}`,
   ].filter(Boolean).join('<br>');
 
   return `<section class="carte">

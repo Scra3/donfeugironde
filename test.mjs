@@ -78,9 +78,19 @@ assert.equal(communes.length, 2, 'seules les lignes sans nom de commune sont ign
 assert.deepEqual(communes[0], {
   nom: 'Bruges', lieu: 'Hôtel de Ville', horaires: '9h-13h',
   besoins: ['Eau', 'Couches'], satures: ['Vêtements'],
-  tel: '0556955095', telLisible: '05 56 95 50 95', email: 'x@y.fr',
+  tel: '0556955095', telLisible: '05 56 95 50 95',
+  email: 'x@y.fr', emailLisible: 'x@y.fr',
   maj: '2026-07-26', qui: 'Marie',
 });
+
+const contactBizarre = lignesVersCommunes(
+  parseCSV('Commune,Besoins,Téléphone,Email\nBruges,Eau,"05 56 95 50 95 poste 4",appelez Marie'),
+  '2026-07-26',
+);
+assert.equal(contactBizarre[0].tel, null, 'pas de lien d\'appel sur un numéro non composable');
+assert.equal(contactBizarre[0].telLisible, '05 56 95 50 95 poste 4',
+  'mais le texte écrit par la personne reste affiché tel quel');
+assert.equal(contactBizarre[0].emailLisible, 'appelez Marie');
 
 const colonnesMelangees = lignesVersCommunes(
   parseCSV('Qui,Commune,Besoins\nPaul,Eysines,Eau'), '2026-07-26',

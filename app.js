@@ -123,6 +123,7 @@ export const lignesVersCommunes = (lignes, aujourdhui) => {
       tel: telPropre(brut.tel),
       telLisible: (brut.tel ?? '').trim(),
       email: emailPropre(brut.email),
+      emailLisible: (brut.email ?? '').trim(),
       maj: parseDate(brut.maj, aujourdhui),
       qui: (brut.qui ?? '').trim(),
     };
